@@ -1,7 +1,7 @@
 package main
 
 import (
-    "api_repo/disc_api/services"
+    "example.com/services"
     "fmt"
     "github.com/gin-gonic/gin"
 )
