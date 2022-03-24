@@ -8,34 +8,40 @@ import (
 )
 
 type Content struct {
-	Speed string	`json:"speed"`
-	Glide string	`json:"glide"`
-	Turn string		`json:"turn"`
-	Fade string		`json:"fade"`
-	Name string		`json:"name"`
-	FlightType string	`json:"flightType"`
-	Brand string		`json:"brand"`
-	FlightPath string	`json:"flightPath"`
+	DataId     string `json:"dataId"`
+	Speed      string `json:"speed"`
+	Glide      string `json:"glide"`
+	Turn       string `json:"turn"`
+	Fade       string `json:"fade"`
+	Name       string `json:"name"`
+	FlightType string `json:"flightType"`
+	Brand      string `json:"brand"`
+	FlightPath string `json:"flightPath"`
 }
 
 type ByStability struct {
-	Stability string `json:"stability"`
-	Discs []Content  `json:"discs"`
+	Stability string    `json:"stability"`
+	Discs     []Content `json:"discs"`
 }
 
 type EveryDisc struct {
-	VeryOverstable []Content  `json:"veryOverstable"`
-	Overstable []Content      `json:"overstable"`
-	Stable []Content          `json:"stable"`
-	Understable []Content     `json:"understable"`
+	VeryOverstable  []Content `json:"veryOverstable"`
+	Overstable      []Content `json:"overstable"`
+	Stable          []Content `json:"stable"`
+	Understable     []Content `json:"understable"`
 	VeryUnderstable []Content `json:"veryUnderstable"`
 }
 
 var url = "https://www.marshallstreetdiscgolf.com/flightguide"
-func buildDisc(elem *goquery.Selection) []Content {
-	var discs  = []Content{}
 
-	elem.Find(".disc-item").Each(func(int int, e *goquery.Selection){
+func buildDisc(elem *goquery.Selection) []Content {
+	var discs = []Content{}
+
+	elem.Find(".disc-item").Each(func(int int, e *goquery.Selection) {
+		dataId, err := e.Attr("data-id")
+		if err == false {
+			dataId = ""
+		}
 		speed, err := e.Attr("data-speed")
 		if err == false {
 			speed = ""
@@ -69,13 +75,14 @@ func buildDisc(elem *goquery.Selection) []Content {
 			flightP = ""
 		}
 		disc := Content{
-			Speed: speed,
-			Glide: glide,
-			Turn: turn,
-			Fade: fade,
-			Name: name,
+			DataId:     dataId,
+			Speed:      speed,
+			Glide:      glide,
+			Turn:       turn,
+			Fade:       fade,
+			Name:       name,
 			FlightType: flightT,
-			Brand: brand,
+			Brand:      brand,
 			FlightPath: flightP,
 		}
 		discs = append(discs, disc)
@@ -84,9 +91,13 @@ func buildDisc(elem *goquery.Selection) []Content {
 }
 
 func buildPutter(elem *goquery.Selection) []Content {
-	var discs  = []Content{}
+	var discs = []Content{}
 
-	elem.Find(".pc-entry").Each(func(int int, e *goquery.Selection){
+	elem.Find(".pc-entry").Each(func(int int, e *goquery.Selection) {
+		dataId, err := e.Attr("data-id")
+		if err == false {
+			dataId = ""
+		}
 		speed, err := e.Attr("data-speed")
 		if err == false {
 			speed = ""
@@ -109,7 +120,7 @@ func buildPutter(elem *goquery.Selection) []Content {
 		}
 		flightT, err := e.Attr("data-category")
 		if err == false {
-			flightT = ""
+			flightT = "Putter"
 		}
 		brand, err := e.Attr("data-brand")
 		if err == false {
@@ -120,13 +131,14 @@ func buildPutter(elem *goquery.Selection) []Content {
 			flightP = ""
 		}
 		disc := Content{
-			Speed: speed,
-			Glide: glide,
-			Turn: turn,
-			Fade: fade,
-			Name: name,
+			DataId:     dataId,
+			Speed:      speed,
+			Glide:      glide,
+			Turn:       turn,
+			Fade:       fade,
+			Name:       name,
 			FlightType: flightT,
-			Brand: brand,
+			Brand:      brand,
 			FlightPath: flightP,
 		}
 		discs = append(discs, disc)
@@ -134,7 +146,7 @@ func buildPutter(elem *goquery.Selection) []Content {
 	return discs
 }
 
-func AllDiscs () EveryDisc {
+func AllDiscs() EveryDisc {
 	var allDiscs = EveryDisc{
 		VeryOverstable:  VeryOverStable(),
 		Overstable:      OverStable(),
@@ -162,7 +174,7 @@ func VeryUnderstable() []Content {
 	}
 	document.Find(".very-understable").Each(func(index int, element *goquery.Selection) {
 		sliceToAdd := buildDisc(element)
-			allDiscs = append(allDiscs, sliceToAdd...)
+		allDiscs = append(allDiscs, sliceToAdd...)
 	})
 
 	return allDiscs
@@ -280,13 +292,13 @@ func Putters() []Content {
 func filterByType(slices []Content, name string, b bool) []Content {
 	var newSlice []Content
 	if b == true {
-		for i:=0; i<len(slices);i++ {
+		for i := 0; i < len(slices); i++ {
 			if strings.ToLower(slices[i].Brand) == strings.ToLower(name) {
 				newSlice = append(newSlice, slices[i])
 			}
 		}
 	} else {
-		for i:=0; i<len(slices);i++ {
+		for i := 0; i < len(slices); i++ {
 			if strings.ToLower(slices[i].Name) == strings.ToLower(name) {
 				newSlice = append(newSlice, slices[i])
 			}
@@ -335,9 +347,9 @@ func ByPutterBrand(brandName string) []Content {
 	}
 
 	document.Find(".putter-parent").Each(func(index int, element *goquery.Selection) {
-			sliceToAdd := buildPutter(element)
-			filteredSlice := filterByType(sliceToAdd, formattedBrand, true)
-			allDiscs = append(allDiscs, filteredSlice...)
+		sliceToAdd := buildPutter(element)
+		filteredSlice := filterByType(sliceToAdd, formattedBrand, true)
+		allDiscs = append(allDiscs, filteredSlice...)
 	})
 	return allDiscs
 }
@@ -357,10 +369,10 @@ func ByName(name string) []Content {
 		log.Fatal("Error loading HTTP response body. ", err)
 	}
 
-	document.Find(".flex-grid-item .flex-column").Each(func(index int, element *goquery.Selection){
-			sliceToAdd := buildDisc(element)
-			filteredSlice := filterByType(sliceToAdd, formattedName, false)
-			singleDisc = append(singleDisc, filteredSlice...)
+	document.Find(".flex-grid-item .flex-column").Each(func(index int, element *goquery.Selection) {
+		sliceToAdd := buildDisc(element)
+		filteredSlice := filterByType(sliceToAdd, formattedName, false)
+		singleDisc = append(singleDisc, filteredSlice...)
 	})
 	return singleDisc
 }
@@ -380,10 +392,10 @@ func ByPutterName(name string) []Content {
 		log.Fatal("Error loading HTTP response body. ", err)
 	}
 
-	document.Find(".putter-parent").Each(func(index int, element *goquery.Selection){
-			sliceToAdd := buildPutter(element)
-			filteredSlice := filterByType(sliceToAdd, formattedName, false)
-			singleDisc = append(singleDisc, filteredSlice...)
+	document.Find(".putter-parent").Each(func(index int, element *goquery.Selection) {
+		sliceToAdd := buildPutter(element)
+		filteredSlice := filterByType(sliceToAdd, formattedName, false)
+		singleDisc = append(singleDisc, filteredSlice...)
 	})
 	return singleDisc
 }
