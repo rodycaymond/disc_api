@@ -97,7 +97,7 @@ func buildPutter(elem *goquery.Selection) []Content {
 	elem.Find(".pc-entry").Each(func(int int, e *goquery.Selection) {
 		dataId, err := e.Attr("data-id")
 		if err == false {
-			dataId = strconv.Itoa(int)
+			dataId = strconv.Itoa(int + 962)
 		}
 		speed, err := e.Attr("data-speed")
 		if err == false {
