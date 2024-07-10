@@ -1,2 +1,2 @@
 # disc_api
-A repo containing my latest API
+This api was created in Golang as a project for skill improvement and language understanding. It features web-scraping logic which parses the DOM of a particular disc golf website to obtain information about discs. The endpoints allow for batch requests of discs with various filters to further specify the type of disc you may be looking for. It does not use a database, and it relatively future-proof as the website it scraps updates on its own.
